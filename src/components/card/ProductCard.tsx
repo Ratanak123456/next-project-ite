@@ -13,39 +13,98 @@ import {
 import { Product } from "@/lib/types/ProductType"
 import { useState } from "react"
 
+function normalizeImageUrl(image: string) {
+    const trimmedImage = image.trim()
+
+    try {
+        const parsedImage = JSON.parse(trimmedImage)
+
+        if (Array.isArray(parsedImage) && typeof parsedImage[0] === "string") {
+            return parsedImage[0]
+        }
+
+        if (typeof parsedImage === "string") {
+            return parsedImage
+        }
+    } catch {
+        return trimmedImage
+    }
+
+    return trimmedImage
+}
+
+function getDisplayImageUrl(image: string) {
+    try {
+        const imageUrl = new URL(image)
+
+        if (
+            imageUrl.protocol === "https:" &&
+            imageUrl.hostname === "api.escuelajs.co" &&
+            imageUrl.pathname.startsWith("/api/v1/files/")
+        ) {
+            return `/api/image-proxy?url=${encodeURIComponent(imageUrl.toString())}`
+        }
+    } catch {
+        return image
+    }
+
+    return image
+}
+
 export function ProductCard({
     id,
     title,
-    slug,
     price,
     description,
     images,
 }: Product) {
     const [currentImage, setCurrentImage] = useState(0)
+    const [failedImages, setFailedImages] = useState<Set<string>>(new Set())
+    const productImages = images.map(normalizeImageUrl).filter(Boolean)
+    const activeImageIndex = productImages[currentImage] ? currentImage : 0
+    const activeImage = productImages[activeImageIndex]
+    const displayImage = activeImage ? getDisplayImageUrl(activeImage) : ""
+    const canShowActiveImage = activeImage && !failedImages.has(activeImage)
 
     const nextImage = () => {
-        setCurrentImage((prev) => (prev + 1) % images.length)
+        setCurrentImage((prev) => (prev + 1) % productImages.length)
     }
 
     const prevImage = () => {
-        setCurrentImage((prev) => (prev - 1 + images.length) % images.length)
+        setCurrentImage((prev) => (prev - 1 + productImages.length) % productImages.length)
     }
 
     return (
         <Card className="group relative mx-auto w-full max-w-sm overflow-hidden border-0 pt-0 shadow-lg transition-all duration-300 hover:shadow-xl">
-            <div className="relative aspect-4/3overflow-hidden bg-slate-100">
-                <img
-                src={images[currentImage] || "/placeholder.svg"}
-                alt={title}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+            <div className="relative overflow-hidden bg-slate-100" style={{ aspectRatio: "4 / 3" }}>
+                {canShowActiveImage ? (
+                    <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                        src={displayImage}
+                        alt={title}
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        onError={() => {
+                            setFailedImages((previousFailedImages) => {
+                                const nextFailedImages = new Set(previousFailedImages)
+                                nextFailedImages.add(activeImage)
+                                return nextFailedImages
+                            })
+                        }}
+                        />
+                    </>
+                ) : (
+                    <div className="flex h-full w-full items-center justify-center text-sm text-slate-400">
+                    Image unavailable
+                    </div>
+                )}
                 <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent" />
                 <CardAction className="absolute right-3 top-3 z-10">
                 <Badge className="bg-white/90 text-slate-900 backdrop-blur-sm hover:bg-white">
                     ${price.toFixed(2)}
                 </Badge>
                 </CardAction>
-                {images.length > 1 && (
+                {productImages.length > 1 && (
                 <>
                     <button
                     onClick={prevImage}
@@ -64,12 +123,12 @@ export function ProductCard({
                     </svg>
                     </button>
                     <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-                    {images.map((_, idx) => (
+                    {productImages.map((_, idx) => (
                         <button
                         key={idx}
                         onClick={() => setCurrentImage(idx)}
                         className={`h-1.5 rounded-full transition-all duration-300 ${
-                            idx === currentImage ? "w-5 bg-white" : "w-1.5 bg-white/50"
+                            idx === activeImageIndex ? "w-5 bg-white" : "w-1.5 bg-white/50"
                         }`}
                         />
                     ))}
