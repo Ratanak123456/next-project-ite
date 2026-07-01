@@ -8,8 +8,6 @@ export default function ProductPage() {
 
     if (isLoading) return <div>Loading...</div>;
     if (isError) return <div>Error loading products</div>;
-    console.log(products);
-    
 
     return (
         <div className="grid gap-6 gap-x-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 place-content-center w-70%">
