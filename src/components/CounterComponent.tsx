@@ -1,6 +1,6 @@
 "use client"
 import { Button } from './ui/button'
-import { useAppDispatch, useAppSelector } from '@/lib/hook'
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hook'
 import { decrement, increment, reset } from '@/lib/features/counter/counterSlice';
 
 export default function CounterComponent() {

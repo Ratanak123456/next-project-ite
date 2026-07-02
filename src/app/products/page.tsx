@@ -1,7 +1,7 @@
 "use client"
 
 import { ProductCard } from "@/components/card/ProductCard";
-import { useGetProductsQuery } from "@/lib/features/api/ecommerceApi"
+import { useGetProductsQuery } from "@/lib/redux/service/productApi"
 
 export default function ProductPage() {
     const { data: products = [], isError, isLoading } = useGetProductsQuery();
@@ -10,7 +10,7 @@ export default function ProductPage() {
     if (isError) return <div>Error loading products</div>;
 
     return (
-        <div className="grid gap-6 gap-x-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 place-content-center w-70%">
+        <main className="grid gap-6 gap-x-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 place-content-center w-70%">
         {products.map((product) => (
             <ProductCard
             key={product.id}
@@ -22,6 +22,6 @@ export default function ProductPage() {
             slug={product.slug}
             />
         ))}
-        </div>
+        </main>
     );
 }

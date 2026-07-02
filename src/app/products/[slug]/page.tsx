@@ -4,7 +4,7 @@ import { use } from "react"
 import Link from "next/link"
 import { useState } from "react"
 import { ArrowLeft, ShoppingCart, Star, Heart, ShieldCheck, Truck, RotateCcw } from "lucide-react"
-import { useGetProductBySlugQuery } from "@/lib/features/api/ecommerceApi"
+import { useGetProductBySlugQuery } from "@/lib/redux/service/productApi"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
@@ -97,7 +97,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
     const mainImage = displayImages[selectedImageIdx] || ""
 
     return (
-        <div className="mx-auto w-full max-w-6xl px-4 py-8 md:py-16">
+        <main className="mx-auto w-full max-w-6xl px-4 py-8 md:py-16">
             <Link href="/products" className="group mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
                 <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
                 Back to Products
@@ -213,6 +213,6 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     )
 }

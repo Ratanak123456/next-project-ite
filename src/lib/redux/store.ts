@@ -1,15 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 import  counter  from '@/lib/features/counter/counterSlice';
-import { ecommerceApi } from './features/api/ecommerceApi';
+import { ProductApi } from './service/productApi';
 
 export const makeStore = () => {
     return configureStore({
         reducer: {
             counter,
-            [ecommerceApi.reducerPath]: ecommerceApi.reducer,
+            [ProductApi.reducerPath]: ProductApi.reducer,
         },
         middleware: (getDefaultMiddleware) =>
-            getDefaultMiddleware().concat(ecommerceApi.middleware),
+            getDefaultMiddleware().concat(ProductApi.middleware),
     })
 }
 
